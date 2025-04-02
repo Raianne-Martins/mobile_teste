@@ -1,4 +1,3 @@
-// Home.js
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
@@ -8,7 +7,7 @@ const Home = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo ao Cosmepedia mobile!</Text>
       
-      {/* Seção de Acesso */}
+
       <View style={styles.accessContainer}>
         <TouchableOpacity 
           style={styles.button} 
@@ -25,7 +24,6 @@ const Home = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Seção de Pesquisar */}
       <Text style={styles.subtitle}>Pesquise:</Text>
       <View style={styles.searchContainer}>
         <TouchableOpacity 

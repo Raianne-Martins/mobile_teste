@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Button, Alert } from 'react-native';
-import api from '../services/api'; // ajuste o caminho conforme sua estrutura
+import api from '../services/api'; 
 
 const TesteAPI = () => {
   const testarRegistro = async () => {

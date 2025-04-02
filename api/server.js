@@ -8,25 +8,34 @@ const bcrypt = require('bcrypt');
 const app = express();
 app.use(bodyParser.json());
 
-// Configure a conexão com o MySQL - atualize os dados conforme necessário
+
 const connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,  // Utilize a variável DB_PORT
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,  
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE
 });
 
-// Conecta ao banco de dados
-connection.connect(error => {
-  if (error) {
-    console.error('Erro ao conectar no banco de dados:', error);
+
+connection.connect((err) => {
+  if (err) {
+    console.error('Erro ao conectar ao MySQL:', err);
     return;
   }
   console.log('Conexão com o MySQL estabelecida com sucesso!');
+  
+ 
+  connection.query('SHOW DATABASES', (err, results) => {
+    if (err) {
+      console.error('Erro ao listar databases:', err);
+      return;
+    }
+    console.log('Databases disponíveis:', results);
+  });
 });
 
-// Perguntas secretas permitidas
+
 const perguntasSecretas = [
   'Qual o nome do seu primeiro pet?',
   'Qual o nome o seu primeiro namorado(a)?',
@@ -35,70 +44,75 @@ const perguntasSecretas = [
   'Qual o nome do seu professor favorito?'
 ];
 
-/* 
-Endpoint de registro de usuário.
-Espera receber um JSON com os seguintes campos:
-  - nome
-  - email
-  - login
-  - senha
-  - perguntaSecreta (deve ser uma das permitidas do array perguntasSecretas)
-  - respostaSecreta
-  - idTipoUsuario (deve ser um valor válido da tabela TipoUsuario)
-*/
+
 app.post('/api/users/register', async (req, res) => {
+  console.log('Dados recebidos no backend:', req.body);
+
+  const { nome, email, senha, perguntaSecreta, respostaSecreta, tipoUsuario, cpf, cnpj } = req.body;
+  
+ 
+  if (!nome || !email || !senha || !perguntaSecreta || !respostaSecreta || !tipoUsuario) {
+    return res.status(400).json({ error: 'Dados inválidos ou incompletos!' });
+  }
+
+
+  if (!perguntasSecretas.includes(perguntaSecreta)) {
+    return res.status(400).json({ error: 'A pergunta secreta é inválida.' });
+  }
+  
+
+  if (tipoUsuario === 'Empresa') {
+    if (!cnpj) {
+      return res.status(400).json({ error: 'CNPJ é obrigatório para empresas.' });
+    }
+  } else if (tipoUsuario === 'Geral' || tipoUsuario === 'Administrador') {
+    if (!cpf) {
+      return res.status(400).json({ error: 'CPF é obrigatório para usuários gerais e administradores.' });
+    }
+  } else {
+    return res.status(400).json({ error: 'Tipo de usuário inválido.' });
+  }
+
   try {
-    const { nome, email, login, senha, perguntaSecreta, respostaSecreta, idTipoUsuario } = req.body;
-
-    if (!nome || !email || !login || !senha || !perguntaSecreta || !respostaSecreta || !idTipoUsuario) {
-      return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
-    }
-
-    // Verifica se a pergunta secreta é permitida
-    if (!perguntasSecretas.includes(perguntaSecreta)) {
-      return res.status(400).json({ error: 'A pergunta secreta é inválida.' });
-    }
-
-    // Criptografa a senha usando a variável "senha"
+ 
     const senhaCripto = await bcrypt.hash(senha, 10);
 
+   
+    const cpfValue = (tipoUsuario === 'Empresa') ? null : cpf;
+    const cnpjValue = (tipoUsuario === 'Empresa') ? cnpj : null;
+
     const query = `
-      INSERT INTO Usuario (nome, email, login, senha, perguntaSecreta, respostaSecreta, idTipoUsuario)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO Usuario (tipoUsuario, nome, email, senha, cpf, cnpj, perguntaSecreta, respostaSecreta)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
+    
     connection.query(
       query,
-      [nome, email, login, senhaCripto, perguntaSecreta, respostaSecreta, idTipoUsuario],
-      (error, results) => {
-        if (error) {
-          console.error('Erro ao inserir usuário:', error);
-          return res.status(500).json({ error: 'Erro ao registrar usuário.' });
+      [tipoUsuario, nome, email, senhaCripto, cpfValue, cnpjValue, perguntaSecreta, respostaSecreta],
+      (err, results) => {
+        if (err) {
+          console.error('Erro ao inserir usuário:', err);
+          return res.status(500).json({ error: 'Erro interno ao registrar usuário.' });
         }
-        res.json({ message: 'Usuário registrado com sucesso!', userId: results.insertId });
+        res.status(200).send('Usuário cadastrado com sucesso!');
       }
     );
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Erro interno.' });
+    console.error('Erro no registro:', err);
+    return res.status(500).json({ error: 'Erro interno.' });
   }
 });
 
-/* 
-Endpoint de login do usuário.
-Espera receber um JSON com:
-  - login
-  - senha
-Realiza a busca na tabela Usuario e compara a senha informada com a senha criptografada armazenada.
-*/
+
 app.post('/api/users/login', async (req, res) => {
   try {
-    const { login, senha } = req.body;
-    if (!login || !senha) {
-      return res.status(400).json({ error: 'Login e senha são obrigatórios.' });
+    const { email, senha } = req.body;
+    if (!email || !senha) {
+      return res.status(400).json({ error: 'Email e senha são obrigatórios.' });
     }
 
-    const query = `SELECT * FROM Usuario WHERE login = ?`;
-    connection.query(query, [login], async (error, results) => {
+    const query = `SELECT * FROM Usuario WHERE email = ?`;
+    connection.query(query, [email], async (error, results) => {
       if (error) {
         console.error('Erro ao buscar usuário:', error);
         return res.status(500).json({ error: 'Erro no login.' });
@@ -121,8 +135,8 @@ app.post('/api/users/login', async (req, res) => {
   }
 });
 
-// Inicia o servidor na porta 3000 (ou na porta definida na variável de ambiente PORT)
+
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`API rodando na porta ${port}`);
 });

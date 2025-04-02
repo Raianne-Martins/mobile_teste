@@ -1,39 +1,66 @@
-// src/screens/CadastroUsuario.js
 import React, { useState } from 'react';
+import api from '../services/api';
 import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
 const CadastroUsuario = ({ navigation }) => {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [perguntasecreta, setPerguntaSecreta] = useState('');
+  const [perguntasecreta, setPerguntaSecreta] = useState('Escolha sua pergunta de segurança');
   const [respostasecreta, setRespostaSecreta] = useState('');
+  const [tipousuario, setTipoUsuario] = useState('Selecione o tipo de usuário');
+  const [cpf, setCpf] = useState('');
+  const [cnpj, setCnpj] = useState('');
+
+  const perguntas = [
+    'Qual o nome do seu primeiro pet?',
+    'Qual o nome do seu primeiro namorado(a)?',
+    'Qual cidade você nasceu?',
+    'Qual o nome da maternidade que você nasceu?',
+    'Qual o nome do seu professor favorito?'
+  ];
+
+  const tiposUsuario = [
+    { label: 'Geral', value: 'Geral' },
+    { label: 'Empresa', value: 'Empresa' },
+    { label: 'Administrador', value: 'Administrador' },
+  ];
 
   const handleCadastro = async () => {
+    console.log("handleCadastro acionado");
     try {
-      const response = await fetch("http://10.0.2.2:3000/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nome,
-          email,
-          login: email, 
-          senha,
-          perguntaSecreta: perguntasecreta,
-          respostaSecreta: respostasecreta,
-          idTipoUsuario: 2  
-        }),
-      });
       
-      const data = await response.json();
-      
-      if (response.ok) {
+      const payload = {
+        nome,
+        email,
+        login: email, 
+        senha,
+        perguntaSecreta: perguntasecreta,
+        respostaSecreta: respostasecreta,
+        tipoUsuario: tipousuario,
+      };
+
+   
+      if (tipousuario === 'Empresa') {
+        payload.cnpj = cnpj;
+      } else {
+        payload.cpf = cpf;
+      }
+
+      console.log("Dados enviados:", payload);
+      const response = await api.post('/api/users/register', payload);
+
+      console.log("Resposta do servidor:", response);
+    
+      if (response.status === 200) {
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
         navigation.navigate("Home");
       } else {
-        Alert.alert("Erro no Cadastro", data.error || "Tente novamente.");
+        Alert.alert("Erro no Cadastro", response.data.error || "Tente novamente.");
       }
     } catch (error) {
+      console.error("Erro no handleCadastro:", error);
       Alert.alert("Erro", "Ocorreu um erro: " + error.message);
     }
   };
@@ -61,20 +88,63 @@ const CadastroUsuario = ({ navigation }) => {
         value={senha} 
         onChangeText={setSenha}
       />
-      {/* Colocar um dropdown para escolher a pergunta secreta */}
       <TextInput 
         style={styles.input} 
         placeholder="Pergunta Secreta" 
         value={perguntasecreta} 
-        onChangeText={setPerguntaSecreta}
+        editable={false}
       />
+      <Picker
+        selectedValue={perguntasecreta}
+        style={styles.picker}
+        onValueChange={(itemValue) => setPerguntaSecreta(itemValue)}
+      >
+
+        {perguntas.map((pergunta, index) => (
+          <Picker.Item key={index} label={pergunta} value={pergunta} />
+        ))}
+      </Picker>
+
       <TextInput 
         style={styles.input} 
-        placeholder="Resposta Pergunta Secreta" 
+        placeholder="Resposta da Pergunta Secreta" 
         secureTextEntry 
         value={respostasecreta} 
         onChangeText={setRespostaSecreta}
       />
+
+      <TextInput 
+        style={styles.input} 
+        placeholder="Tipo de Usuário" 
+        value={tipousuario} 
+        editable={false}
+      />
+      <Picker
+        selectedValue={tipousuario}
+        style={styles.picker}
+        onValueChange={(itemValue) => setTipoUsuario(itemValue)}
+      >
+        {tiposUsuario.map((tipo, index) => (
+          <Picker.Item key={index} label={tipo.label} value={tipo.value} />
+        ))}
+      </Picker>
+
+      {tipousuario === 'Empresa' ? (
+        <TextInput 
+          style={styles.input} 
+          placeholder="CNPJ" 
+          value={cnpj} 
+          onChangeText={setCnpj}
+        />
+      ) : (
+        <TextInput 
+          style={styles.input} 
+          placeholder="CPF" 
+          value={cpf} 
+          onChangeText={setCpf}
+        />
+      )}
+
       <TouchableOpacity style={styles.button} onPress={handleCadastro}>
         <Text style={styles.buttonText}>Cadastrar</Text>
       </TouchableOpacity>
@@ -101,6 +171,14 @@ const styles = StyleSheet.create({
     borderRadius: 5, 
     padding: 10, 
     marginBottom: 15 
+  },
+  picker: {
+    width: '100%', 
+    height: 50, 
+    borderWidth: 1, 
+    borderColor: '#ccc', 
+    borderRadius: 5, 
+    marginBottom: 15,
   },
   button: { 
     backgroundColor: '#6200EE', 

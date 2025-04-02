@@ -1,4 +1,3 @@
-// src/screens/Login.js
 import React, { useState } from 'react';
 import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
@@ -12,7 +11,7 @@ const Login = ({ navigation }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          login: email,  
+          email: email, 
           senha: senha
         }),
       });
@@ -63,3 +62,4 @@ const styles = StyleSheet.create({
 });
 
 export default Login;
+

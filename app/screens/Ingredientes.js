@@ -6,7 +6,7 @@ const Ingredientes = () => {
   const [ingredientes, setIngredientes] = useState([]);
 
   useEffect(() => {
-    // Exemplo de requisição usando axios
+ 
     api.get('/ingredientes')
       .then(response => setIngredientes(response.data))
       .catch(error => console.error(error));
