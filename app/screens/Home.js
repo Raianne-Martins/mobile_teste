@@ -24,7 +24,7 @@ const Home = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.subtitle}>Pesquise:</Text>
+     {/*<Text style={styles.subtitle}>Pesquise:</Text>
       <View style={styles.searchContainer}>
         <TouchableOpacity 
           style={styles.searchButton}
@@ -46,7 +46,7 @@ const Home = ({ navigation }) => {
         >
           <Text style={styles.searchButtonText}>Ponto de Descarte</Text>
         </TouchableOpacity>
-      </View>
+      </View>*/}
     </View>
   );
 };
