@@ -1,105 +1,94 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import BaseLayout from '../components/BaseLayout';
 
 const Home = ({ navigation }) => {
-    console.log('Home renderizada!');
+  
+  const [expanded, setExpanded] = useState(false);
+  
+
+  const toggleTray = () => {
+    setExpanded(!expanded);
+  };
+
+
+  const halfScreenHeight = Dimensions.get('window').height / 2;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo ao Cosmepedia mobile!</Text>
-      
+    <BaseLayout navigation={navigation}>
+     
+      <View style={styles.content}>
+       
+        <Image 
+          source={require('../../assets/logo_laranja.png')}
+          style={styles.logo}
+        />
 
-      <View style={styles.accessContainer}>
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={() => navigation.navigate('CadastroUsuario')}
-        >
-          <Text style={styles.buttonText}>Cadastre-se</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.button} 
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+        
+        <View style={[styles.tray, { height: expanded ? halfScreenHeight : 60 }]}>
+          <TouchableOpacity onPress={toggleTray} style={styles.trayToggle}>
+            <Text style={styles.trayToggleText}>
+              {expanded ? '▼' : '▲'}
+            </Text>
+          </TouchableOpacity>
+          {expanded && (
+            <View style={styles.trayContent}>
+              <Text style={styles.trayContentText}>Ingredientes</Text>
+            </View>
+          )}
+        </View>
       </View>
-
-     {/*<Text style={styles.subtitle}>Pesquise:</Text>
-      <View style={styles.searchContainer}>
-        <TouchableOpacity 
-          style={styles.searchButton}
-          onPress={() => navigation.navigate('Ingredientes')}
-        >
-          <Text style={styles.searchButtonText}>Ingredientes</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.searchButton}
-          onPress={() => navigation.navigate('Produtos')}
-        >
-          <Text style={styles.searchButtonText}>Produtos</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.searchButton}
-          onPress={() => navigation.navigate('PontoDeDescarte')}
-        >
-          <Text style={styles.searchButtonText}>Ponto de Descarte</Text>
-        </TouchableOpacity>
-      </View>*/}
-    </View>
+    </BaseLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  accessContainer: {
-    flexDirection: 'row',
-    marginBottom: 30,
-  },
-  button: {
-    backgroundColor: '#6200EE',
-    paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 5,
-    marginHorizontal: 10,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 15,
-  },
-  searchContainer: {
+  header: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-around', 
+    alignItems: 'center',
     width: '100%',
+    paddingVertical: 15,
   },
-  searchButton: {
-    backgroundColor: '#03DAC5',
+  icon: {
+    marginHorizontal: 10, 
+  },
+  logo: {
+    width: 300,
+    height: 300,
+    resizeMode: 'contain',
+    marginTop: 30,
+  },
+  tray: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    backgroundColor: '#EDDEA4',
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  trayToggle: {
     paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    marginHorizontal: 5,
   },
-  searchButtonText: {
-    color: '#fff',
-    fontSize: 14,
+  trayToggleText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  trayContent: {
+    marginTop: 10,
+  },
+  trayContentText: {
+    fontSize: 16,
+    color: '#000',
   },
 });
 

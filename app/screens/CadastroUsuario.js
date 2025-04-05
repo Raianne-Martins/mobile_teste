@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
 import api from '../services/api';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet, Alert, ToastAndroid, Platform } from 'react-native';
+import { cpf as cpfValidator, cnpj as cnpjValidator } from 'cpf-cnpj-validator';
 import { Picker } from '@react-native-picker/picker';
+import BaseLayout from '../components/BaseLayout';
+
+const mostrarMensagem = (mensagem) => {
+  if (Platform.OS === 'android') {
+    ToastAndroid.show(mensagem, ToastAndroid.LONG);
+  } else {
+    Alert.alert('Aviso', mensagem);
+  }
+};
 
 const CadastroUsuario = ({ navigation }) => {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [perguntasecreta, setPerguntaSecreta] = useState('Escolha sua pergunta de segurança');
+  const [perguntasecreta, setPerguntaSecreta] = useState('');
   const [respostasecreta, setRespostaSecreta] = useState('');
-  const [tipousuario, setTipoUsuario] = useState('Selecione o tipo de usuário');
+  const [tipousuario, setTipoUsuario] = useState('');
   const [cpf, setCpf] = useState('');
   const [cnpj, setCnpj] = useState('');
 
@@ -29,8 +39,24 @@ const CadastroUsuario = ({ navigation }) => {
 
   const handleCadastro = async () => {
     console.log("handleCadastro acionado");
+    
+    if (tipousuario === '') {
+      mostrarMensagem('Por favor, selecione o tipo de usuário.');
+      return;
+    }
+    if (tipousuario === 'Empresa') {
+      if (!cnpjValidator.isValid(cnpj)) {
+        mostrarMensagem('CNPJ inválido.');
+        return;
+      }
+    } else {
+      if (!cpfValidator.isValid(cpf)) {
+        mostrarMensagem('CPF inválido.');
+        return;
+      }
+    }
+
     try {
-      
       const payload = {
         nome,
         email,
@@ -41,7 +67,6 @@ const CadastroUsuario = ({ navigation }) => {
         tipoUsuario: tipousuario,
       };
 
-   
       if (tipousuario === 'Empresa') {
         payload.cnpj = cnpj;
       } else {
@@ -66,89 +91,80 @@ const CadastroUsuario = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Cadastro de Usuário</Text>
-      <TextInput 
-        style={styles.input} 
-        placeholder="Nome" 
-        value={nome} 
-        onChangeText={setNome} 
-      />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Email" 
-        keyboardType="email-address" 
-        value={email} 
-        onChangeText={setEmail} 
-      />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Senha" 
-        secureTextEntry 
-        value={senha} 
-        onChangeText={setSenha}
-      />
-      <TextInput 
-        style={styles.input} 
-        placeholder="Pergunta Secreta" 
-        value={perguntasecreta} 
-        editable={false}
-      />
-      <Picker
-        selectedValue={perguntasecreta}
-        style={styles.picker}
-        onValueChange={(itemValue) => setPerguntaSecreta(itemValue)}
-      >
-
-        {perguntas.map((pergunta, index) => (
-          <Picker.Item key={index} label={pergunta} value={pergunta} />
-        ))}
-      </Picker>
-
-      <TextInput 
-        style={styles.input} 
-        placeholder="Resposta da Pergunta Secreta" 
-        secureTextEntry 
-        value={respostasecreta} 
-        onChangeText={setRespostaSecreta}
-      />
-
-      <TextInput 
-        style={styles.input} 
-        placeholder="Tipo de Usuário" 
-        value={tipousuario} 
-        editable={false}
-      />
-      <Picker
-        selectedValue={tipousuario}
-        style={styles.picker}
-        onValueChange={(itemValue) => setTipoUsuario(itemValue)}
-      >
-        {tiposUsuario.map((tipo, index) => (
-          <Picker.Item key={index} label={tipo.label} value={tipo.value} />
-        ))}
-      </Picker>
-
-      {tipousuario === 'Empresa' ? (
+    <BaseLayout navigation={navigation}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Cadastro de Usuário</Text>
         <TextInput 
           style={styles.input} 
-          placeholder="CNPJ" 
-          value={cnpj} 
-          onChangeText={setCnpj}
+          placeholder="Nome" 
+          value={nome} 
+          onChangeText={setNome} 
         />
-      ) : (
         <TextInput 
           style={styles.input} 
-          placeholder="CPF" 
-          value={cpf} 
-          onChangeText={setCpf}
+          placeholder="Email" 
+          keyboardType="email-address" 
+          value={email} 
+          onChangeText={setEmail} 
         />
-      )}
+        <TextInput 
+          style={styles.input} 
+          placeholder="Senha" 
+          secureTextEntry 
+          value={senha} 
+          onChangeText={setSenha}
+        />
+        <Picker
+         selectedValue={perguntasecreta}
+         style={styles.picker}
+         onValueChange={(itemValue) => setPerguntaSecreta(itemValue)}
+        >
+        <Picker.Item label="Escolha sua pergunta de segurança" value="" />
+         {perguntas.map((pergunta, index) => (
+        <Picker.Item key={index} label={pergunta} value={pergunta} />
+        ))}
+        </Picker>
 
-      <TouchableOpacity style={styles.button} onPress={handleCadastro}>
-        <Text style={styles.buttonText}>Cadastrar</Text>
-      </TouchableOpacity>
-    </View>
+        <TextInput 
+          style={styles.input} 
+          placeholder="Resposta da pergunta de segurança" 
+          secureTextEntry 
+          value={respostasecreta} 
+          onChangeText={setRespostaSecreta}
+        />
+
+        <Picker
+          selectedValue={tipousuario}
+          style={styles.picker}
+          onValueChange={(itemValue) => setTipoUsuario(itemValue)}
+        >
+          <Picker.Item label="Selecione o tipo de usuário" value="" />
+          {tiposUsuario.map((tipo, index) => (
+            <Picker.Item key={index} label={tipo.label} value={tipo.value} />
+          ))}
+        </Picker>
+
+        {tipousuario === 'Empresa' ? (
+          <TextInput 
+            style={styles.input} 
+            placeholder="CNPJ" 
+            value={cnpj} 
+            onChangeText={setCnpj}
+          />
+        ) : (
+          <TextInput 
+            style={styles.input} 
+            placeholder="CPF" 
+            value={cpf} 
+            onChangeText={setCpf}
+          />
+        )}
+
+        <TouchableOpacity style={styles.button} onPress={handleCadastro}>
+          <Text style={styles.buttonText}>Cadastrar</Text>
+        </TouchableOpacity>
+      </View>
+    </BaseLayout>
   );
 };
 
@@ -157,7 +173,8 @@ const styles = StyleSheet.create({
     flex: 1, 
     padding: 20, 
     justifyContent: 'center', 
-    alignItems: 'center' 
+    alignItems: 'center', 
+    backgroundColor: '#F9F7F3'
   },
   title: { 
     fontSize: 26, 
@@ -174,14 +191,14 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: '100%', 
-    height: 50, 
+    height: 60, 
     borderWidth: 1, 
     borderColor: '#ccc', 
     borderRadius: 5, 
     marginBottom: 15,
   },
   button: { 
-    backgroundColor: '#6200EE', 
+    backgroundColor: '#F7A072', 
     padding: 15, 
     borderRadius: 5 
   },
