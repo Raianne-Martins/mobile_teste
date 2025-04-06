@@ -41,7 +41,7 @@ const Login = ({ navigation }) => {
   return (
     <BaseLayout navigation={navigation}>
       <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.title}>LOGIN</Text>
         <TextInput 
           style={styles.input}
           placeholder="Email" 
@@ -57,7 +57,11 @@ const Login = ({ navigation }) => {
           onChangeText={setSenha} 
         />
         <TouchableOpacity onPress={() => navigation.navigate('RecuperarSenha')}>
-          <Text style={{ color: '#6200EE', textAlign: 'center', marginTop: 10 }}>Esqueci minha senha</Text>
+          <Text style={{ color: '#778899', textAlign: 'center', marginTop: 10, gap: 10, }}>Esqueci minha senha</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => navigation.navigate('CadastroUsuario')}>
+          <Text style={{ color: '#778899', textAlign: 'center', marginTop: 10, gap: 10,padding:10 }}>Registre-se</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -70,9 +74,9 @@ const Login = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center', backgroundColor:'#F9F7F3' },
-  title: { fontSize: 26, fontWeight: 'bold', marginBottom: 20 },
+  title: { fontSize: 46, fontWeight: 'bold', marginBottom: 20, color: '#F7A072', textAlign: 'center', transform: [{ translateY: -40 }], },
   input: { width: '100%', borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 10, marginBottom: 15 },
-  button: { backgroundColor: '#F7A072', padding: 15, borderRadius: 5 },
+  button: { backgroundColor: 'blue', padding: 10, borderRadius: 5,},
   buttonText: { color: '#fff', fontSize: 16 },
 });
 

@@ -117,7 +117,7 @@ app.post('/api/users/recuperar-senha', (req, res) => {
       return res.status(404).json({ error: 'Usuário não encontrado.' });
     }
 
-    // Gerar token e definir data de expiração (ex.: 1 hora)
+    // Gerar token e definir data de expiração 
     const token = crypto.randomBytes(20).toString('hex');
     const expiryDate = Date.now() + 3600000; // 1 hora em milissegundos
 
@@ -132,8 +132,7 @@ app.post('/api/users/recuperar-senha', (req, res) => {
         return res.status(500).json({ error: 'Erro ao gerar token de recuperação.' });
       }
 
-      // Aqui você pode integrar o envio de email usando uma biblioteca como Nodemailer.
-      // Para fins de teste, estamos apenas logando o link de recuperação no console.
+
       const resetLink = `https://seu-app.com/resetar-senha?token=${token}`;
       console.log(`Link para redefinição de senha: ${resetLink}`);
 

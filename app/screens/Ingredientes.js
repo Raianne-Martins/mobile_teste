@@ -1,39 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import api from '../services/api';  
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import BaseLayout from '../components/BaseLayout';
 
-const Ingredientes = () => {
-  const [ingredientes, setIngredientes] = useState([]);
-
-  useEffect(() => {
- 
-    api.get('/ingredientes')
-      .then(response => setIngredientes(response.data))
-      .catch(error => console.error(error));
-  }, []);
-
+const Ingredientes = ({ navigation }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Ingredientes</Text>
-      <FlatList 
-        data={ingredientes}
-        keyExtractor={(item) => item.id ? String(item.id) : Math.random().toString()}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.itemTitle}>{item.nome}</Text>
-            <Text>{item.descricao}</Text>
-          </View>
-        )}
-      />
-    </View>
+    <BaseLayout navigation={navigation}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Ingredientes</Text>
+        <Text style={styles.description}>
+        Página em desenvolvimento
+        </Text>
+      </View>
+    </BaseLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 40 },
-  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 16 },
-  item: { padding: 12, borderBottomWidth: 1, borderColor: '#ccc' },
-  itemTitle: { fontSize: 18, fontWeight: '600' }
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
+  },
+  description: {
+    fontSize: 16,
+    marginTop: 15,
+    textAlign: 'center',
+  },
 });
 
 export default Ingredientes;

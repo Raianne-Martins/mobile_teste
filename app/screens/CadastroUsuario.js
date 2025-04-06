@@ -93,7 +93,7 @@ const CadastroUsuario = ({ navigation }) => {
   return (
     <BaseLayout navigation={navigation}>
       <View style={styles.container}>
-        <Text style={styles.title}>Cadastro de Usuário</Text>
+        <Text style={styles.title}>CADASTRO</Text>
         <TextInput 
           style={styles.input} 
           placeholder="Nome" 
@@ -177,9 +177,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F7F3'
   },
   title: { 
-    fontSize: 26, 
+    fontSize: 50, 
     fontWeight: 'bold', 
-    marginBottom: 20 
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#F7A072',
+    transform: [{ translateY: -30 }],
   },
   input: { 
     width: '100%', 
@@ -187,7 +190,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc', 
     borderRadius: 5, 
     padding: 10, 
-    marginBottom: 15 
+    marginBottom: 15 ,
   },
   picker: {
     width: '100%', 
@@ -198,8 +201,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   button: { 
-    backgroundColor: '#F7A072', 
-    padding: 15, 
+    backgroundColor: 'blue', 
+    padding: 10, 
     borderRadius: 5 
   },
   buttonText: { 

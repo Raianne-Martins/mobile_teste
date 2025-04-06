@@ -11,19 +11,19 @@ const HeaderAlterado = ({ navigation }) => {
   <View style={styles.iconsContainer}>
 
    <View style={styles.starIconContainer}>
-    <TouchableOpacity onPress={() => console.log('Estrela clicada')}>
+    <TouchableOpacity onPress={() => navigation.navigate('Home')}>
       <Ionicons name="star" size={28} color="#fff" />
     </TouchableOpacity>
    </View>
 
   <View style={styles.rightIconsContainer}>
-    <TouchableOpacity onPress={() => console.log('Creme clicado')}>
+    <TouchableOpacity onPress={() => navigation.navigate('Produtos')}>
       <MaterialCommunityIcons name="pot-mix-outline" size={28} color="#fff" />
     </TouchableOpacity>
-    <TouchableOpacity onPress={() => console.log('Frasco clicado')}>
+    <TouchableOpacity onPress={() => navigation.navigate('Ingredientes')}>
       <Ionicons name="flask-outline" size={28} color="#fff" />
     </TouchableOpacity>
-    <TouchableOpacity onPress={() => console.log('Localização clicada')}>
+    <TouchableOpacity onPress={() => navigation.navigate('PontoDeDescarte')}>
       <Entypo name="location" size={28} color="#fff" />
     </TouchableOpacity>
     </View>
